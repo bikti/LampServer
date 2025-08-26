@@ -1,17 +1,30 @@
 import paho.mqtt.client as mqtt
 from django.conf import settings
+import json
 
 # Callback при подключении
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print('Connected successfully')
-        client.subscribe('django/mqtt')  # подписываемся на тему
+        client.subscribe('topic/devices')  # подписываемся на тему
     else:
         print('Bad connection. Code:', rc)
 
 # Callback при получении сообщения
 def on_message(client, userdata, msg):
-    print(f'Received message on topic: {msg.topic} with payload: {msg.payload}')
+    payload_str = msg.payload.decode('utf-8')
+    print(f'Received message on topic: {msg.topic} with payload: {payload_str}')
+    if(msg.topic=="topic/devices"): 
+        # Парсим JSON
+        data = json.loads(payload_str)
+        
+        # Извлекаем данные
+        device_name = data.get('deviceName')
+        device_model = data.get('deviceModel')
+        serial_number = data.get('serialNumber')
+        
+        print(f'Device: {device_name}, Model: {device_model}, SN: {serial_number}')
+
     # Здесь можно добавить обработку сообщений
 
 # Создаем и настраиваем клиента
