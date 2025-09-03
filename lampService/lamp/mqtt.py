@@ -19,11 +19,11 @@ def on_message(client, userdata, msg):
         data = json.loads(payload_str)
         
         # Извлекаем данные
-        device_name = data.get('deviceName')
-        device_model = data.get('deviceModel')
-        serial_number = data.get('serialNumber')
-        
-        print(f'Device: {device_name}, Model: {device_model}, SN: {serial_number}')
+        device_name = data.get('device_name')
+        device_model = data.get('device_model')
+        serial_number = data.get('device_sn')
+        init_device = data.get('device_init')
+        print(f'Device: {device_name}, Model: {device_model}, SN: {serial_number} Init: {init_device}')
 
     # Здесь можно добавить обработку сообщений
 

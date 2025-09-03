@@ -2,7 +2,80 @@ from django.db import models
 from django.core.validators import MinLengthValidator
 import uuid
 
+class DeviceSettings(models.Model):
+    brightness =  models.IntegerField(
+        default=100,
+        verbose_name=' Яркость',
+        help_text='Настройка якрости устройства'
+    )
+
+    сolor =  models.CharField(
+        max_length=10,
+        validators=[MinLengthValidator(3)],
+        verbose_name='Цвет',
+        help_text='Цвет для освещения'
+    )
+
+    count_led =  models.IntegerField(
+        default=1,
+        verbose_name='Количество светодиодов',
+        help_text='оличество светодиодов'
+    )
+
+
+    class Meta:
+       verbose_name = 'DeviceSetting'
+       verbose_name_plural = 'DeviceSettings'
+
+    
+    def __str__(self):
+        return f"{self.brightness} - {self.сolor}   ({self.count_led}) "
+
+
 class Device(models.Model):
+        # Основная информация из MQTT
+    name = models.CharField(
+        max_length=100,
+        verbose_name='Device Name',
+        help_text='Название устройства'
+    )
+    model = models.CharField(
+        max_length=100,
+        verbose_name='Device Model',
+        help_text='Модель устройства'
+    )
+    serial_number = models.CharField(
+        max_length=100,
+        unique=True,
+        validators=[MinLengthValidator(3)],
+        verbose_name='Serial Number',
+        help_text='Серийный номер устройства',
+        db_index=True  # Индекс для быстрого поиска
+    )
+
+    is_init = models.BooleanField(
+        default=True,
+        verbose_name='Is Init',
+        help_text='Инициализировано ли конкретное устройство'
+    )
+
+    setting_device = models.ForeignKey(DeviceSettings, on_delete=models.CASCADE)
+    
+    class Meta:
+       verbose_name = 'Device'
+       verbose_name_plural = 'Devices'
+       indexes = [
+           models.Index(fields=['serial_number']),
+           models.Index(fields=['is_init']),
+       ]
+    
+    def __str__(self):
+        return f"{self.name} - {self.model}   ({self.serial_number}) "
+
+
+
+
+class DeviceOld(models.Model):
     # Статусы устройства
     STATUS_CHOICES = [
         ('online', 'Online'),
